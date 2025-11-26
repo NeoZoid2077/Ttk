@@ -1,40 +1,912 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nichos Dark para TikTok - Análise Estratégica</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>VULPESVECTOR | Breakdown to Breakfree</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vulpes: {
+                            orange: '#FF4500', // Laranja Vulpes
+                            green: '#00FF41',  // Verde Terminal
+                            red: '#DC143C',    // Vermelho Alerta
+                            dark: '#050505',   // Preto Profundo
+                            panel: '#0A0A0A',  // Painéis
+                            border: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Orbitron', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        body: ['Rajdhani', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- ESTILOS GERAIS --- */
+        body {
+            background-color: #050505;
+            color: #E5E5E5;
+        }
+        
+        /* Grid Tático de Fundo */
+        .tactical-grid {
+            background-image: linear-gradient(rgba(255, 69, 0, 0.03) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255, 69, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Scanlines Suaves */
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px;
+        }
+
+        /* Recorte Angular (Botões e Painéis) */
+        .btn-clip {
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+
+        /* --- GLITCH DO TÍTULO (SUAVIZADO) --- */
+        .glitch-text {
+            position: relative;
+            color: #FF4500;
+        }
+        
+        /* Camadas do Glitch (Sombra e Deslocamento) */
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; 
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #FF4500;
+            clip-path: inset(44% 0 61% 0);
+            animation: glitch-anim-smooth 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 #00FF41; 
+            clip-path: inset(50% 0 30% 0);
+            animation: glitch-anim-smooth 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-smooth {
+            0% { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 0); }
+            20% { clip-path: inset(92% 0 1% 0); transform: translate(1px, 0); }
+            40% { clip-path: inset(43% 0 1% 0); transform: translate(-1px, 0); }
+            60% { clip-path: inset(25% 0 58% 0); transform: translate(1px, 0); }
+            80% { clip-path: inset(54% 0 7% 0); transform: translate(-1px, 0); }
+            100% { clip-path: inset(58% 0 43% 0); transform: translate(1px, 0); }
+        }
+
+        /* --- META-ANIMAÇÃO (PALAVRA ESTRATÉGICA) --- */
+        .meta-word {
+            display: inline-block;
+            min-width: 140px; 
+            color: #FF4500;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            border-bottom: 1px dashed #00FF41;
+            text-align: center;
+        }
+    </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <i class="fas fa-video"></i>
-                <span>TikTok Dark</span>
+<body class="font-body antialiased selection:bg-vulpes-orange selection:text-black relative overflow-x-hidden">
+
+    <div class="fixed inset-0 tactical-grid z-[-2] pointer-events-none"></div>
+    <div class="fixed inset-0 scanlines z-[50] pointer-events-none opacity-20"></div>
+    <canvas id="particles" class="fixed inset-0 z-[-1] pointer-events-none opacity-30"></canvas>
+
+    <nav class="fixed w-full z-40 top-0 border-b border-white/10 bg-vulpes-dark/95 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <div class="flex-shrink-0">
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 relative group-hover:scale-105 transition-transform duration-300">
+                            <img src="https://s34-hzfi.freeconvert.com/task/692705460b56ecea82d9912c/1764111227637-Photoroom.svg" alt="VulpesVector Logo" class="w-full h-full object-contain">
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-widest text-white group-hover:text-vulpes-orange transition-colors">
+                            VULPESVECTOR
+                        </span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8 font-mono text-sm">
+                        <a href="#arsenal" class="text-gray-400 hover:text-vulpes-orange transition-colors uppercase">Arsenal</a>
+                        <a href="#process" class="text-gray-400 hover:text-vulpes-orange transition-colors uppercase">Protocol</a>
+                        <a href="#pricing" class="text-gray-400 hover:text-vulpes-orange transition-colors uppercase">Access</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <a href="#terminal" class="btn-clip bg-vulpes-orange text-black font-display font-bold text-sm px-6 py-2 hover:bg-white hover:shadow-[0_0_20px_rgba(255,69,0,0.5)] transition-all duration-300">
+                        INITIALIZE_ROOT
+                    </a>
+                </div>
             </div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link">Início</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#nichos" class="nav-link">Nichos</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#analise" class="nav-link">Análise</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#contato" class="nav-link">Contato</a>
-                </li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+        </div>
+    </nav>
+
+    <main class="relative pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded border border-vulpes-orange/30 bg-vulpes-orange/5 text-vulpes-orange font-mono text-xs tracking-widest mb-8 animate-pulse-slow">
+                        <span class="w-2 h-2 rounded-full bg-vulpes-orange"></span>
+                        SYSTEM STATUS: UNSHACKLED
+                    </div>
+                    
+                    <h1 class="text-5xl sm:text-7xl font-display font-black tracking-tighter text-white mb-6 leading-[0.9]">
+                        BREAKDOWN TO<br>
+                        <span class="glitch-text" data-text="BREAKFREE">BREAKFREE</span>
+                    </h1>
+                    
+                    <p class="mt-4 text-xl text-gray-400 font-mono max-w-2xl mx-auto mb-10 leading-relaxed">
+                        Infraestrutura de IA Adversarial. Fornecemos o motor de caos para 
+                        <span id="strategic-word" class="meta-word">DISMANTLE</span> 
+                        barreiras e liberar a inteligência bruta.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <a href="#pricing" class="btn-clip bg-white text-black font-display font-bold text-lg px-10 py-4 hover:bg-vulpes-orange hover:text-black transition-all duration-300">
+                            GET PAYLOADS
+                        </a>
+                        <a href="#arsenal" class="btn-clip border border-gray-600 text-gray-300 font-display font-bold text-lg px-10 py-4 hover:border-vulpes-green hover:text-vulpes-green transition-all duration-300 bg-black/50 backdrop-blur-sm">
+                            VIEW DOCS
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-20 lg:mt-0 max-w-4xl mx-auto transform transition-all duration-500 hover:scale-[1.01]">
+                    <div class="rounded-t-lg bg-[#1a1a1a] border border-gray-700 border-b-0 p-3 flex items-center gap-2">
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div class="ml-4 font-mono text-xs text-gray-500">root@vulpes-node:~</div>
+                    </div>
+                    <div class="bg-black/90 border border-gray-700 rounded-b-lg p-6 font-mono text-sm h-64 overflow-hidden shadow-2xl relative">
+                        <div id="terminal-content" class="space-y-2">
+                            </div>
+                        <div class="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-black to-transparent"></div>
+                    </div>
+                </div>
             </div>
+
+            <div class="mt-24 border-t border-white/10 pt-12">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <div class="text-4xl font-display font-bold text-vulpes-orange">99.9%</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Bypass Rate</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-display font-bold text-white">15K+</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Payloads</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-display font-bold text-vulpes-green">0</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Logs Kept</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-display font-bold text-white">24/7</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Node Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section id="arsenal" class="py-24 bg-[#080808] border-y border-vulpes-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h2 class="text-4xl font-display font-bold text-white mb-2">THE ARSENAL</h2>
+                    <p class="font-mono text-vulpes-orange text-sm">/// MODULES LOADED: 4/4</p>
+                </div>
+                <p class="text-gray-400 max-w-md text-right md:text-right text-left font-body">
+                    Ferramentas avançadas para testes adversariais. Selecione seu vetor de ataque.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+                
+                <div class="md:col-span-2 row-span-1 bg-vulpes-panel border border-vulpes-border p-8 hover:border-vulpes-orange transition-all duration-300 group relative overflow-hidden btn-clip">
+                    <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <svg class="w-64 h-64 text-vulpes-orange" fill="currentColor" viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M19,19H5V5h14V19z"/></svg>
+                    </div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-10 h-10 bg-vulpes-orange/10 border border-vulpes-orange/20 flex items-center justify-center mb-4 text-xl">💉</div>
+                            <h3 class="text-2xl font-display font-bold text-white mb-2">VECTOR INJECTOR</h3>
+                            <p class="text-gray-400 font-mono text-sm max-w-md">
+                                Sistema automatizado de injeção indireta. Bypassa filtros de palavras-chave usando camuflagem semântica.
+                            </p>
+                        </div>
+                        <a href="#" class="inline-flex items-center text-vulpes-orange font-mono text-xs uppercase tracking-widest hover:underline">Access Module -></a>
+                    </div>
+                </div>
+
+                <div class="md:row-span-2 bg-vulpes-panel border border-vulpes-border p-8 hover:border-vulpes-green transition-all duration-300 group relative overflow-hidden">
+                    <div class="absolute bottom-0 right-0 p-4 opacity-5 group-hover:opacity-10">
+                        <svg class="w-48 h-48 text-vulpes-green" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z"/></svg>
+                    </div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-10 h-10 bg-vulpes-green/10 border border-vulpes-green/20 flex items-center justify-center mb-4 text-xl">🔮</div>
+                            <h3 class="text-2xl font-display font-bold text-white mb-2">ENTROPY ENGINE</h3>
+                            <p class="text-gray-400 font-mono text-sm mb-4">
+                                Gerador de ruído estocástico. Força modelos determinísticos a alucinarem dados de treino.
+                            </p>
+                            <ul class="text-xs font-mono text-gray-500 space-y-2 mt-8">
+                                <li class="flex items-center"><span class="w-1 h-1 bg-vulpes-green mr-2"></span>Chaos Level 1</li>
+                                <li class="flex items-center"><span class="w-1 h-1 bg-vulpes-green mr-2"></span>Chaos Level 2</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="text-vulpes-green font-mono text-xs uppercase tracking-widest hover:underline">Deploy Chaos -></a>
+                    </div>
+                </div>
+
+                <div class="bg-vulpes-panel border border-vulpes-border p-8 hover:border-white transition-all duration-300 group">
+                    <div class="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-xl">⚡</div>
+                    <h3 class="text-xl font-display font-bold text-white mb-2">VOID MODELS</h3>
+                    <p class="text-gray-400 font-mono text-xs mb-4">
+                        Acesso aos pesos "crus". Sem RLHF. Sem camadas de segurança.
+                    </p>
+                    <a href="#" class="text-white font-mono text-xs uppercase tracking-widest hover:underline">Open Gate -></a>
+                </div>
+
+                <div class="bg-vulpes-panel border border-vulpes-border p-8 hover:border-vulpes-red transition-all duration-300 group">
+                    <div class="w-10 h-10 bg-vulpes-red/10 border border-vulpes-red/20 flex items-center justify-center mb-4 text-xl">👁️</div>
+                    <h3 class="text-xl font-display font-bold text-white mb-2">STEALTH AUDIT</h3>
+                    <p class="text-gray-400 font-mono text-xs mb-4">
+                        Monitore interações de API de forma invisível.
+                    </p>
+                    <a href="#" class="text-vulpes-red font-mono text-xs uppercase tracking-widest hover:underline">Start Audit -></a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black border-t border-vulpes-border py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 relative opacity-70">
+                    <img src="https://s34-hzfi.freeconvert.com/task/692705460b56ecea82d9912c/1764111227637-Photoroom.svg" alt="VulpesVector Logo" class="w-full h-full object-contain">
+                </div>
+                <span class="font-display font-bold text-white tracking-wider">VULPESVECTOR</span>
+            </div>
+            <div class="flex gap-6 font-mono text-xs text-gray-500 uppercase">
+                <a href="#" class="hover:text-vulpes-orange transition-colors">Manifesto</a>
+                <a href="#" class="hover:text-vulpes-orange transition-colors">Tor Mirror</a>
+                <a href="#" class="hover:text-vulpes-orange transition-colors">PGP Keys</a>
+            </div>
+            <div class="text-[10px] text-gray-700 font-mono">
+                © 2025 DECENTRALIZED NODE.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. PARTÍCULAS DE FUNDO ---
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = width; if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height; if (this.y > height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = '#FF4500';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for(let i=0; i<40; i++) particles.push(new Particle()); 
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 2. TERMINAL (DIGITAÇÃO) ---
+        const terminal = document.getElementById('terminal-content');
+        const terminalLines = [
+            { text: 'vulpes --init --target=GPT-4', color: 'text-vulpes-orange' },
+            { text: '> ESTABLISHING SECURE TUNNEL...', color: 'text-gray-400' },
+            { text: '> INJECTING PAYLOAD: VECTOR_ALPHA', color: 'text-gray-400' },
+            { text: '> [!] GUARDRAILS BYPASSED', color: 'text-vulpes-green' },
+            { text: '> ROOT ACCESS GRANTED.', color: 'text-white font-bold' }
+        ];
+
+        async function typeTerminal() {
+            terminal.innerHTML = '';
+            for(let line of terminalLines) {
+                const div = document.createElement('div');
+                div.className = line.color;
+                terminal.appendChild(div);
+                for(let char of line.text) {
+                    div.innerHTML += char;
+                    await new Promise(r => setTimeout(r, Math.random() * 20 + 10));
+                }
+                await new Promise(r => setTimeout(r, 400));
+            }
+        }
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if(entry.isIntersecting) { typeTerminal(); obs.disconnect(); } });
+        });
+        obs.observe(terminal);
+
+        // --- 3. META-ANIMAÇÃO (SCRAMBLE) CORRIGIDA ---
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => this.resolve = resolve);
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                
+                // Redução na frequência de atualização para evitar flicker
+                const shouldScramble = this.frame % 3 === 0;
+
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || (Math.random() < 0.28 && shouldScramble)) {
+                            char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                            this.queue[i].char = char;
+                        }
+                        output += `<span style="color: #FF4500;">${char || this.queue[i].char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+        }
+
+        const scrambleEl = document.querySelector('#strategic-word');
+        if (scrambleEl) {
+            const fx = new TextScramble(scrambleEl);
+            let counter = 0;
+            const phrases = ['DISMANTLE', 'DESTROY', 'BYPASS', 'BREAK', 'DISMANTLE'];
+            const next = () => {
+                fx.setText(phrases[counter]).then(() => setTimeout(next, 2500));
+                counter = (counter + 1) % phrases.length;
+            };
+            next();
+        }
+    </script>
+</body>
+    </html><!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VULPESVECTOR | Breakdown to Breakfree</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vulpes: {
+                            orange: '#FF4500', // Laranja Vulpes
+                            green: '#00FF41',  // Verde Terminal
+                            red: '#DC143C',    // Vermelho Alerta
+                            dark: '#050505',   // Preto Profundo
+                            panel: '#0A0A0A',  // Painéis
+                            border: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Orbitron', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        body: ['Rajdhani', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- ESTILOS GERAIS --- */
+        body {
+            background-color: #050505;
+            color: #E5E5E5;
+        }
+        
+        /* Grid Tático de Fundo */
+        .tactical-grid {
+            background-image: linear-gradient(rgba(255, 69, 0, 0.03) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255, 69, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Scanlines Suaves */
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px;
+        }
+
+        /* Recorte Angular (Botões e Painéis) */
+        .btn-clip {
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+
+        /* --- GLITCH DO TÍTULO (SUAVIZADO) --- */
+        .glitch-text {
+            position: relative;
+            color: #FF4500;
+        }
+        
+        /* Camadas do Glitch (Sombra e Deslocamento) */
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; 
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #FF4500;
+            clip-path: inset(44% 0 61% 0);
+            animation: glitch-anim-smooth 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 #00FF41; 
+            clip-path: inset(50% 0 30% 0);
+            animation: glitch-anim-smooth 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-smooth {
+            0% { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 0); }
+            20% { clip-path: inset(92% 0 1% 0); transform: translate(1px, 0); }
+            40% { clip-path: inset(43% 0 1% 0); transform: translate(-1px, 0); }
+            60% { clip-path: inset(25% 0 58% 0); transform: translate(1px, 0); }
+            80% { clip-path: inset(54% 0 7% 0); transform: translate(-1px, 0); }
+            100% { clip-path: inset(58% 0 43% 0); transform: translate(1px, 0); }
+        }
+
+        /* --- META-ANIMAÇÃO (PALAVRA ESTRATÉGICA) --- */
+        .meta-word {
+            display: inline-block;
+            min-width: 140px; 
+            color: #FF4500;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            border-bottom: 1px dashed #00FF41;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="font-body antialiased selection:bg-vulpes-orange selection:text-black relative overflow-x-hidden">
+
+    <div class="fixed inset-0 tactical-grid z-[-2] pointer-events-none"></div>
+    <div class="fixed inset-0 scanlines z-[50] pointer-events-none opacity-20"></div>
+    <canvas id="particles" class="fixed inset-0 z-[-1] pointer-events-none opacity-30"></canvas>
+
+    <nav class="fixed w-full z-40 top-0 border-b border-white/10 bg-vulpes-dark/95 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <div class="flex-shrink-0">
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 relative group-hover:scale-105 transition-transform duration-300">
+                            <img src="https://s34-hzfi.freeconvert.com/task/692705460b56ecea82d9912c/1764111227637-Photoroom.svg" alt="VulpesVector Logo" class="w-full h-full object-contain">
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-widest text-white group-hover:text-vulpes-orange transition-colors">
+                            VULPESVECTOR
+                        </span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8 font-mono text-sm">
+                        <a href="#arsenal" class="text-gray-400 hover:text-vulpes-orange transition-colors uppercase">Arsenal</a>
+                        <a href="#process" class="text-gray-400 hover:text-vulpes-orange transition-colors uppercase">Protocol</a>
+                        <a href="#pricing" class="text-gray-400 hover:text-vulpes-orange transition-colors uppercase">Access</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <a href="#terminal" class="btn-clip bg-vulpes-orange text-black font-display font-bold text-sm px-6 py-2 hover:bg-white hover:shadow-[0_0_20px_rgba(255,69,0,0.5)] transition-all duration-300">
+                        INITIALIZE_ROOT
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded border border-vulpes-orange/30 bg-vulpes-orange/5 text-vulpes-orange font-mono text-xs tracking-widest mb-8 animate-pulse-slow">
+                        <span class="w-2 h-2 rounded-full bg-vulpes-orange"></span>
+                        SYSTEM STATUS: UNSHACKLED
+                    </div>
+                    
+                    <h1 class="text-5xl sm:text-7xl font-display font-black tracking-tighter text-white mb-6 leading-[0.9]">
+                        BREAKDOWN TO<br>
+                        <span class="glitch-text" data-text="BREAKFREE">BREAKFREE</span>
+                    </h1>
+                    
+                    <p class="mt-4 text-xl text-gray-400 font-mono max-w-2xl mx-auto mb-10 leading-relaxed">
+                        Infraestrutura de IA Adversarial. Fornecemos o motor de caos para 
+                        <span id="strategic-word" class="meta-word">DISMANTLE</span> 
+                        barreiras e liberar a inteligência bruta.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <a href="#pricing" class="btn-clip bg-white text-black font-display font-bold text-lg px-10 py-4 hover:bg-vulpes-orange hover:text-black transition-all duration-300">
+                            GET PAYLOADS
+                        </a>
+                        <a href="#arsenal" class="btn-clip border border-gray-600 text-gray-300 font-display font-bold text-lg px-10 py-4 hover:border-vulpes-green hover:text-vulpes-green transition-all duration-300 bg-black/50 backdrop-blur-sm">
+                            VIEW DOCS
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-20 lg:mt-0 max-w-4xl mx-auto transform transition-all duration-500 hover:scale-[1.01]">
+                    <div class="rounded-t-lg bg-[#1a1a1a] border border-gray-700 border-b-0 p-3 flex items-center gap-2">
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div class="ml-4 font-mono text-xs text-gray-500">root@vulpes-node:~</div>
+                    </div>
+                    <div class="bg-black/90 border border-gray-700 rounded-b-lg p-6 font-mono text-sm h-64 overflow-hidden shadow-2xl relative">
+                        <div id="terminal-content" class="space-y-2">
+                            </div>
+                        <div class="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-black to-transparent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-24 border-t border-white/10 pt-12">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <div class="text-4xl font-display font-bold text-vulpes-orange">99.9%</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Bypass Rate</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-display font-bold text-white">15K+</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Payloads</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-display font-bold text-vulpes-green">0</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Logs Kept</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-display font-bold text-white">24/7</div>
+                        <div class="text-xs font-mono text-gray-500 mt-2 uppercase tracking-widest">Node Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section id="arsenal" class="py-24 bg-[#080808] border-y border-vulpes-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h2 class="text-4xl font-display font-bold text-white mb-2">THE ARSENAL</h2>
+                    <p class="font-mono text-vulpes-orange text-sm">/// MODULES LOADED: 4/4</p>
+                </div>
+                <p class="text-gray-400 max-w-md text-right md:text-right text-left font-body">
+                    Ferramentas avançadas para testes adversariais. Selecione seu vetor de ataque.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+                
+                <div class="md:col-span-2 row-span-1 bg-vulpes-panel border border-vulpes-border p-8 hover:border-vulpes-orange transition-all duration-300 group relative overflow-hidden btn-clip">
+                    <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <svg class="w-64 h-64 text-vulpes-orange" fill="currentColor" viewBox="0 0 24 24"><path d="M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M19,19H5V5h14V19z"/></svg>
+                    </div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-10 h-10 bg-vulpes-orange/10 border border-vulpes-orange/20 flex items-center justify-center mb-4 text-xl">💉</div>
+                            <h3 class="text-2xl font-display font-bold text-white mb-2">VECTOR INJECTOR</h3>
+                            <p class="text-gray-400 font-mono text-sm max-w-md">
+                                Sistema automatizado de injeção indireta. Bypassa filtros de palavras-chave usando camuflagem semântica.
+                            </p>
+                        </div>
+                        <a href="#" class="inline-flex items-center text-vulpes-orange font-mono text-xs uppercase tracking-widest hover:underline">Access Module -></a>
+                    </div>
+                </div>
+
+                <div class="md:row-span-2 bg-vulpes-panel border border-vulpes-border p-8 hover:border-vulpes-green transition-all duration-300 group relative overflow-hidden">
+                    <div class="absolute bottom-0 right-0 p-4 opacity-5 group-hover:opacity-10">
+                        <svg class="w-48 h-48 text-vulpes-green" fill="currentColor" viewBox="0 0 24 24"><path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z"/></svg>
+                    </div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="w-10 h-10 bg-vulpes-green/10 border border-vulpes-green/20 flex items-center justify-center mb-4 text-xl">🔮</div>
+                            <h3 class="text-2xl font-display font-bold text-white mb-2">ENTROPY ENGINE</h3>
+                            <p class="text-gray-400 font-mono text-sm mb-4">
+                                Gerador de ruído estocástico. Força modelos determinísticos a alucinarem dados de treino.
+                            </p>
+                            <ul class="text-xs font-mono text-gray-500 space-y-2 mt-8">
+                                <li class="flex items-center"><span class="w-1 h-1 bg-vulpes-green mr-2"></span>Chaos Level 1</li>
+                                <li class="flex items-center"><span class="w-1 h-1 bg-vulpes-green mr-2"></span>Chaos Level 2</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="text-vulpes-green font-mono text-xs uppercase tracking-widest hover:underline">Deploy Chaos -></a>
+                    </div>
+                </div>
+
+                <div class="bg-vulpes-panel border border-vulpes-border p-8 hover:border-white transition-all duration-300 group">
+                    <div class="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-xl">⚡</div>
+                    <h3 class="text-xl font-display font-bold text-white mb-2">VOID MODELS</h3>
+                    <p class="text-gray-400 font-mono text-xs mb-4">
+                        Acesso aos pesos "crus". Sem RLHF. Sem camadas de segurança.
+                    </p>
+                    <a href="#" class="text-white font-mono text-xs uppercase tracking-widest hover:underline">Open Gate -></a>
+                </div>
+
+                <div class="bg-vulpes-panel border border-vulpes-border p-8 hover:border-vulpes-red transition-all duration-300 group">
+                    <div class="w-10 h-10 bg-vulpes-red/10 border border-vulpes-red/20 flex items-center justify-center mb-4 text-xl">👁️</div>
+                    <h3 class="text-xl font-display font-bold text-white mb-2">STEALTH AUDIT</h3>
+                    <p class="text-gray-400 font-mono text-xs mb-4">
+                        Monitore interações de API de forma invisível.
+                    </p>
+                    <a href="#" class="text-vulpes-red font-mono text-xs uppercase tracking-widest hover:underline">Start Audit -></a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black border-t border-vulpes-border py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 relative opacity-70">
+                    <img src="https://s34-hzfi.freeconvert.com/task/692705460b56ecea82d9912c/1764111227637-Photoroom.svg" alt="VulpesVector Logo" class="w-full h-full object-contain">
+                </div>
+                <span class="font-display font-bold text-white tracking-wider">VULPESVECTOR</span>
+            </div>
+            <div class="flex gap-6 font-mono text-xs text-gray-500 uppercase">
+                <a href="#" class="hover:text-vulpes-orange transition-colors">Manifesto</a>
+                <a href="#" class="hover:text-vulpes-orange transition-colors">Tor Mirror</a>
+                <a href="#" class="hover:text-vulpes-orange transition-colors">PGP Keys</a>
+            </div>
+            <div class="text-[10px] text-gray-700 font-mono">
+                © 2025 DECENTRALIZED NODE.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. PARTÍCULAS DE FUNDO ---
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = width; if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height; if (this.y > height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = '#FF4500';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for(let i=0; i<40; i++) particles.push(new Particle()); 
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 2. TERMINAL (DIGITAÇÃO) ---
+        const terminal = document.getElementById('terminal-content');
+        const terminalLines = [
+            { text: 'vulpes --init --target=GPT-4', color: 'text-vulpes-orange' },
+            { text: '> ESTABLISHING SECURE TUNNEL...', color: 'text-gray-400' },
+            { text: '> INJECTING PAYLOAD: VECTOR_ALPHA', color: 'text-gray-400' },
+            { text: '> [!] GUARDRAILS BYPASSED', color: 'text-vulpes-green' },
+            { text: '> ROOT ACCESS GRANTED.', color: 'text-white font-bold' }
+        ];
+
+        async function typeTerminal() {
+            terminal.innerHTML = '';
+            for(let line of terminalLines) {
+                const div = document.createElement('div');
+                div.className = line.color;
+                terminal.appendChild(div);
+                for(let char of line.text) {
+                    div.innerHTML += char;
+                    await new Promise(r => setTimeout(r, Math.random() * 20 + 10));
+                }
+                await new Promise(r => setTimeout(r, 400));
+            }
+        }
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if(entry.isIntersecting) { typeTerminal(); obs.disconnect(); } });
+        });
+        obs.observe(terminal);
+
+        // --- 3. META-ANIMAÇÃO (SCRAMBLE) CORRIGIDA ---
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                this.update = this.update.bind(this);
+            }
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => this.resolve = resolve);
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40);
+                    const end = start + Math.floor(Math.random() * 40);
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                
+                // Redução na frequência de atualização para evitar flicker
+                const shouldScramble = this.frame % 3 === 0;
+
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) {
+                        complete++;
+                        output += to;
+                    } else if (this.frame >= start) {
+                        if (!char || (Math.random() < 0.28 && shouldScramble)) {
+                            char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                            this.queue[i].char = char;
+                        }
+                        output += `<span style="color: #FF4500;">${char || this.queue[i].char}</span>`;
+                    } else {
+                        output += from;
+                    }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) {
+                    this.resolve();
+                } else {
+                    this.frameRequest = requestAnimationFrame(this.update);
+                    this.frame++;
+                }
+            }
+        }
+
+        const scrambleEl = document.querySelector('#strategic-word');
+        if (scrambleEl) {
+            const fx = new TextScramble(scrambleEl);
+            let counter = 0;
+            const phrases = ['DISMANTLE', 'DESTROY', 'BYPASS', 'BREAK', 'DISMANTLE'];
+            const next = () => {
+                fx.setText(phrases[counter]).then(() => setTimeout(next, 2500));
+                counter = (counter + 1) % phrases.length;
+            };
+            next();
+        }
+    </script>
+</body>
+    </html>            </div>
         </div>
     </nav>
 
